@@ -1,0 +1,509 @@
+<title>Bảng điều hành AI iOffice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky section nav, KPI strip, then two-column panels that stack on phones */
+:root{
+  --bg:#f5f7fa; --panel:#ffffff; --ink:#0f1a2a; --ink-2:#4a5568; --ink-3:#7a8597;
+  --line:#e2e7ee; --grid:#edf0f4; --accent:#0b5cad; --accent-soft:#e6f0fa;
+  --s-io:#2a78d6; --s-dtp:#eb6834; --p1:#2a78d6; --p2:#eb6834; --p3:#8a93a3;
+  --good:#0ca30c; --warn:#fab219; --crit:#d03b3b; --serious:#ec835a; --muted:#c4cad4;
+  --good-bg:#e7f6e7; --warn-bg:#fdf3dc; --crit-bg:#fbe7e7; --muted-bg:#eef0f3;
+  --f-body:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f141b; --panel:#171d26; --ink:#eef2f7; --ink-2:#b4bdca; --ink-3:#8590a0;
+  --line:#2a3240; --grid:#222a35; --accent:#5aa2ec; --accent-soft:#1a2c42;
+  --s-io:#3987e5; --s-dtp:#d95926; --p1:#3987e5; --p2:#d95926; --p3:#6b7484; --muted:#4a5363;
+  --good-bg:#14301a; --warn-bg:#3a2e10; --crit-bg:#3a1a1a; --muted-bg:#232a35; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141b; --panel:#171d26; --ink:#eef2f7; --ink-2:#b4bdca; --ink-3:#8590a0;
+  --line:#2a3240; --grid:#222a35; --accent:#5aa2ec; --accent-soft:#1a2c42;
+  --s-io:#3987e5; --s-dtp:#d95926; --p1:#3987e5; --p2:#d95926; --p3:#6b7484; --muted:#4a5363;
+  --good-bg:#14301a; --warn-bg:#3a2e10; --crit-bg:#3a1a1a; --muted-bg:#232a35; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:20px;padding-block:20px 48px}
+header.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.eyebrow{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+h1{font-size:24px;line-height:1.25;margin:4px 0 4px;font-weight:700;text-wrap:balance}
+.sub{color:var(--ink-2);max-width:70ch;margin:0}
+.meta{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);text-align:right}
+nav.sec{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;overflow-x:auto;padding-block:10px;border-bottom:1px solid var(--line);margin-bottom:20px}
+nav.sec a{white-space:nowrap;color:var(--ink-2);text-decoration:none;font-size:13px;font-weight:500;padding:6px 12px;border-radius:999px}
+nav.sec a:hover,nav.sec a:focus-visible{background:var(--accent-soft);color:var(--accent);outline:none}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:24px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.kpi .lab{font-size:12.5px;color:var(--ink-2)}
+.kpi .val{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.15}
+.kpi .val small{font-size:15px;font-weight:500;color:var(--ink-3)}
+.kpi .note{font-size:12px;color:var(--ink-3)}
+.kpi.alert{border-color:var(--crit)}
+.kpi.alert .val{color:var(--crit)}
+section{margin-bottom:28px;scroll-margin-top:60px}
+h2{font-size:17px;font-weight:700;margin:0 0 4px}
+.lead{color:var(--ink-2);margin:0 0 14px;max-width:80ch}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.panel h3{font-size:14px;margin:0 0 2px;font-weight:600}
+.panel .cap{font-size:12.5px;color:var(--ink-3);margin:0 0 10px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12.5px;color:var(--ink-2);margin-bottom:8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+svg text{font-family:var(--f-body)}
+.chart{width:100%;height:auto;display:block}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.filters label{font-size:12.5px;color:var(--ink-2);display:flex;gap:6px;align-items:center}
+select,input[type=search]{font:inherit;font-size:13px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+input[type=search]{min-width:0;width:220px;max-width:100%}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{font:inherit;font-size:12.5px;background:var(--panel);color:var(--ink-2);border:0;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.seg button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.count{font-size:12.5px;color:var(--ink-3);margin-left:auto;font-variant-numeric:tabular-nums}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{position:sticky;top:0;background:var(--panel);text-align:left;font-weight:600;font-size:12px;color:var(--ink-2);padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--grid);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td .d{display:block;font-size:12px;color:var(--ink-3);margin-top:2px;max-width:60ch}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.c-good{background:var(--good-bg);color:var(--good)}
+.c-warn{background:var(--warn-bg);color:#a46a00}
+:root[data-theme="dark"] .c-warn{color:var(--warn)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .c-warn{color:var(--warn)}}
+.c-crit{background:var(--crit-bg);color:var(--crit)}
+.c-muted{background:var(--muted-bg);color:var(--ink-2)}
+.need{font-family:var(--f-mono);font-size:12px}
+.need.hi{color:var(--crit);font-weight:500}
+.gaprow td:first-child{box-shadow:inset 3px 0 0 var(--crit)}
+.tip{position:fixed;pointer-events:none;z-index:20;background:var(--ink);color:var(--bg);font-size:12.5px;padding:8px 10px;border-radius:8px;max-width:280px;line-height:1.4;opacity:0;transition:opacity .1s}
+.tip b{display:block;margin-bottom:2px}
+.problems{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}
+.prob{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.prob .tag{font-family:var(--f-mono);font-size:12px;color:var(--accent);font-weight:500}
+.prob h3{font-size:15px;margin:0}
+.prob p{margin:0;color:var(--ink-2);font-size:13px}
+.bars{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;font-size:12.5px}
+.bars .t{height:8px;background:var(--grid);border-radius:4px;overflow:hidden}
+.bars .t span{display:block;height:100%;background:var(--accent);border-radius:4px}
+.bars .n{font-family:var(--f-mono);color:var(--ink-2)}
+.roadmap{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;counter-reset:ph}
+.phase{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+.phase.core{border:2px solid var(--accent);background:linear-gradient(var(--accent-soft),var(--panel) 70%)}
+.phase .when{font-family:var(--f-mono);font-size:12px;color:var(--ink-3)}
+.phase h3{margin:2px 0 8px;font-size:15px}
+.phase ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:13px;display:grid;gap:3px}
+.phase .gate{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--ink-2)}
+.phase .gate b{color:var(--ink)}
+.recs{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.rec{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.rec .no{flex:none;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+.rec p{margin:0;font-size:13.5px}
+.rec .who{display:block;font-size:12px;color:var(--ink-3);margin-top:4px}
+.pend{font-size:12px;color:var(--ink-3);font-style:italic}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;flex-direction:column}
+.stat .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}.stat .v small{font-size:13px;color:var(--ink-3);font-weight:500}
+.stat .l{font-size:12px;color:var(--ink-2)}
+.stat.p1c{box-shadow:inset 3px 0 0 var(--p1)}.stat.p2c{box-shadow:inset 3px 0 0 var(--p2)}.stat.p3c{box-shadow:inset 3px 0 0 var(--p3)}
+.chip.p1c{background:var(--accent-soft);color:var(--p1)}.chip.p2c{background:var(--accent-soft);color:var(--p2)}.chip.p3c{background:var(--muted-bg);color:var(--ink-2)}
+.reset{font:inherit;font-size:12.5px;background:none;border:1px solid var(--line);border-radius:8px;padding:6px 12px;color:var(--ink-2);cursor:pointer}
+.reset:hover,.reset:focus-visible{color:var(--accent);border-color:var(--accent);outline:none}
+.pilot{font-size:12.5px;color:var(--accent);font-weight:500;margin-top:auto}
+.lanes{padding:12px;display:grid;gap:12px}
+.lane{display:grid;grid-template-columns:minmax(150px,200px) 1fr 1fr;gap:10px;align-items:stretch}
+.lane .ln{font-weight:600;font-size:13.5px;align-self:center}
+.stage{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--panel);min-width:0}
+.stage.core{border:2px solid var(--accent);background:var(--accent-soft)}
+.stage .when{display:block;font-family:var(--f-mono);font-size:12px;color:var(--ink-3)}
+.stage b{display:block;font-size:13.5px;margin:2px 0 4px}
+.stage p{margin:0;font-size:12.5px;color:var(--ink-2)}
+@media (max-width:640px){.lane{grid-template-columns:1fr}}
+.note{background:var(--warn-bg);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:12px;max-width:100ch}
+.stat.fhi{box-shadow:inset 3px 0 0 var(--good)}.stat.fmid{box-shadow:inset 3px 0 0 var(--warn)}
+details.ev{margin-top:4px}details.ev summary{cursor:pointer;color:var(--accent);font-size:12.5px;font-weight:500}
+details.ev summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+details.ev dl{margin:6px 0 2px;display:grid;grid-template-columns:max-content 1fr;gap:4px 10px;font-size:12.5px;max-width:80ch}
+details.ev dt{color:var(--ink-3);font-weight:600}details.ev dd{margin:0;color:var(--ink-2)}
+@media (max-width:560px){details.ev dl{grid-template-columns:1fr}}
+.tgroups{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
+.tg{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.tg h3{font-size:14px;margin:0 0 8px;color:var(--accent)}
+.tg ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:13px;color:var(--ink-2)}
+.foot{font-size:12px;color:var(--ink-3);border-top:1px solid var(--line);padding-top:14px;margin-top:8px}
+.foot a{color:var(--accent)}
+@media (max-width:560px){h1{font-size:20px}.meta{text-align:left}.kpi .val{font-size:26px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="eyebrow">VNPT IT · Ban Chiến lược · Mảng chính quyền số</div>
+    <h1>Bảng điều hành AI iOffice: khoảng trống, ưu tiên và lộ trình</h1>
+    <p class="sub">Đồng Tháp chạy trên nền VNPT iOffice; "DTP" là bản tùy biến có AI của tỉnh, "iOffice v5" là bản chuẩn.</p>
+  </div>
+  <div class="meta">Cập nhật 02/10/2026</div>
+</header>
+
+<nav class="sec" aria-label="Các phần">
+  <a href="#tongquan">Tổng quan</a><a href="#sosanh">So sánh tính năng</a><a href="#dongthap">AI tại Đồng Tháp</a><a href="#nangcap">Gói nâng cấp 2026</a><a href="#baitoan">3 bài toán</a><a href="#uutien">Ưu tiên bổ sung</a><a href="#lotrinh">Lộ trình</a><a href="#nhiemvu">Nhiệm vụ đề xuất</a><a href="#ruiro">Rủi ro</a>
+</nav>
+
+<section id="tongquan">
+  <div class="kpis" id="kpis"></div>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Đáp ứng theo nhóm tính năng</h3>
+      <p class="cap">Số tính năng đáp ứng đầy đủ trên tổng số trong nhóm. iOffice thiếu nhiều nhất ở xử lý sâu 1 văn bản và tự cấu hình AI.</p>
+      <div class="legend"><span><i style="background:var(--s-dtp)"></i>DTP (bản Đồng Tháp)</span><span><i style="background:var(--s-io)"></i>iOffice v5 (bản chuẩn)</span></div>
+      <svg class="chart" id="chGroups" role="img" aria-label="Số tính năng đáp ứng theo nhóm, DTP và iOffice v5"></svg>
+    </div>
+    <div class="panel">
+      <h3>Khoảng trống của iOffice theo mức cần thiết</h3>
+      <p class="cap">Các tính năng iOffice v5 chưa đáp ứng hoặc mới đáp ứng một phần, chia theo mức cần thiết trong bảng so sánh.</p>
+      <svg class="chart" id="chGap" role="img" aria-label="Khoảng trống iOffice theo mức cần thiết"></svg>
+      <p class="cap" style="margin-top:10px">Ngược lại, có 5 tính năng iOffice có mà DTP chưa có: gợi ý nơi nhận, tham chiếu số ký hiệu, văn bản liên quan tự động, tìm trích yếu bằng giọng nói, lấy nội dung xử lý từ file.</p>
+    </div>
+  </div>
+</section>
+
+<section id="sosanh">
+  <h2>So sánh chi tiết 32 tính năng</h2>
+  <p class="lead">Lọc theo nhóm, mức cần thiết hoặc chỉ xem khoảng trống. Dòng có vạch đỏ là tính năng mức Cao mà iOffice chưa đáp ứng đầy đủ.</p>
+  <div class="filters">
+    <label for="fGroup">Nhóm <select id="fGroup"><option value="">Tất cả</option></select></label>
+    <label for="fNeed">Mức cần thiết <select id="fNeed"><option value="">Tất cả</option><option>Cao</option><option>Trung bình</option><option>Thấp</option></select></label>
+    <div class="seg" role="group" aria-label="Phạm vi">
+      <button type="button" id="vAll" aria-pressed="true">Tất cả</button><button type="button" id="vGap" aria-pressed="false">Khoảng trống iOffice</button><button type="button" id="vIoOnly" aria-pressed="false">iOffice có, DTP chưa</button>
+    </div>
+    <input type="search" id="fText" placeholder="Tìm tính năng…" aria-label="Tìm tính năng">
+    <span class="count" id="fCount"></span>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Nhóm</th><th>Tính năng</th><th>DTP</th><th>iOffice v5</th><th>Mức cần thiết</th></tr></thead>
+    <tbody id="tFeat"></tbody>
+  </table></div>
+</section>
+
+<section id="dongthap">
+  <h2>Lớp AI đã có trên bản iOffice Đồng Tháp</h2>
+  <p class="lead">Rà soát mã nguồn, chuẩn hóa và đưa về bản chuẩn iOffice v6 thay vì xây lại.</p>
+  <div class="note" role="note"><b>Cần DAS đánh giá thêm:</b> với từng tính năng, trường hợp nào <b>hợp tác</b> với đơn vị đã phát triển tại Đồng Tháp, trường hợp nào <b>VNPT IT tự thực hiện</b>, hoặc đề xuất phương án khác. Cột "Phương án thực hiện" để trống chờ kết quả đánh giá.</div>
+  <div class="filters"><div class="seg" role="group" aria-label="Lọc đề xuất">
+    <button type="button" data-dt="" aria-pressed="true">Tất cả</button><button type="button" data-dt="Đưa về bản chuẩn" aria-pressed="false">Đưa về bản chuẩn</button><button type="button" data-dt="iOffice đã có" aria-pressed="false">iOffice đã có</button><button type="button" data-dt="Cải tiến khi đưa về" aria-pressed="false">Cải tiến khi đưa về</button>
+  </div><span class="count" id="dtCount"></span></div>
+  <div class="tbl"><table>
+    <thead><tr><th>Tính năng</th><th>Điểm chạm trong luồng</th><th>Nhận xét</th><th>Đề xuất</th><th>Phương án thực hiện</th></tr></thead>
+    <tbody id="tDT"></tbody>
+  </table></div>
+</section>
+
+<section id="nangcap">
+  <h2>Danh mục tư vấn nâng cấp 2026</h2>
+  <p class="lead">Phần lớn hạng mục là chức năng đã có hoặc chatbot cần huấn luyện dữ liệu. Chưa có hạng mục nào cho 3 bài toán của lãnh đạo tỉnh.</p>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Mức sẵn sàng theo nền tảng</h3>
+      <p class="cap">Số hạng mục trên web và app di động.</p>
+      <div class="legend" id="lgUp"></div>
+      <svg class="chart" id="chUp" role="img" aria-label="Mức sẵn sàng của các hạng mục nâng cấp theo nền tảng"></svg>
+    </div>
+    <div class="panel" style="padding:0;overflow:hidden">
+      <div style="padding:16px 16px 8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <h3 style="margin:0">Hạng mục</h3>
+        <div class="seg" role="group" aria-label="Nền tảng" style="margin-left:auto">
+          <button type="button" data-sec="" aria-pressed="true">Tất cả</button><button type="button" data-sec="Web" aria-pressed="false">Web</button><button type="button" data-sec="App" aria-pressed="false">App</button>
+        </div>
+      </div>
+      <div style="max-height:340px;overflow:auto;border-top:1px solid var(--line)"><table>
+        <thead><tr><th>Hạng mục</th><th>Nền tảng</th><th>Trạng thái</th></tr></thead>
+        <tbody id="tUp"></tbody>
+      </table></div>
+    </div>
+  </div>
+</section>
+
+<section id="baitoan">
+  <h2>3 bài toán lãnh đạo tỉnh đặt ra</h2>
+  <p class="lead">Không có trong DTP, iOffice v5 hay gói nâng cấp 2026. Cả ba cần chung một lớp dữ liệu pháp luật có trạng thái hiệu lực đến điều, khoản.</p>
+  <div class="problems" id="probs"></div>
+</section>
+
+<section id="uutien">
+  <h2>Nội dung cần bổ sung và thứ tự ưu tiên</h2>
+  <p class="lead">21 nội dung cần bổ sung vào bản chuẩn iOffice v6. P1: lãnh đạo tỉnh đã yêu cầu, có sẵn ở bản Đồng Tháp hoặc là nền cho nội dung khác. P2: phụ thuộc P1 hoặc dữ liệu chưa sẵn sàng. P3: giá trị thấp hoặc chờ kết quả thí điểm. Độ khó và thời gian từng nội dung do DAS phối hợp công ty AI hoặc DTP đánh giá.</p>
+  <div class="filters">
+    <label for="pGroup">Nhóm <select id="pGroup"><option value="">Tất cả</option></select></label>
+    <label for="pPhase">Thời điểm <select id="pPhase"><option value="">Tất cả</option></select></label>
+    <label for="pState">Hiện trạng <select id="pState"><option value="">Tất cả</option></select></label>
+    <div class="seg" role="group" aria-label="Mức ưu tiên">
+      <button type="button" data-p="" aria-pressed="true">Tất cả</button><button type="button" data-p="P1" aria-pressed="false">P1</button><button type="button" data-p="P2" aria-pressed="false">P2</button><button type="button" data-p="P3" aria-pressed="false">P3</button>
+    </div>
+    <button type="button" class="reset" id="pReset">Xóa lọc</button>
+  </div>
+  <div class="stats" id="pStats"></div>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Số nội dung theo nhóm và mức ưu tiên</h3>
+      <p class="cap">Theo bộ lọc đang chọn. Rê chuột vào từng đoạn để xem số lượng.</p>
+      <div class="legend"><span><i style="background:var(--p1)"></i>P1 – làm ngay</span><span><i style="background:var(--p2)"></i>P2 – làm tiếp</span><span><i style="background:var(--p3)"></i>P3 – khi có nhu cầu</span></div>
+      <svg class="chart" id="chPrio" role="img" aria-label="Số nội dung cần bổ sung theo nhóm và mức ưu tiên"></svg>
+    </div>
+    <div class="panel">
+      <h3>Số nội dung theo thời điểm</h3>
+      <p class="cap">Theo bộ lọc đang chọn.</p>
+      <svg class="chart" id="chPhase" role="img" aria-label="Số nội dung cần bổ sung theo thời điểm"></svg>
+    </div>
+  </div>
+  <div class="tbl" style="margin-top:16px"><table>
+    <thead><tr><th>Thứ tự</th><th>Nội dung</th><th>Nhóm</th><th>Ưu tiên</th><th>Thời điểm</th><th>Hiện trạng</th></tr></thead>
+    <tbody id="tPrio"></tbody>
+  </table></div>
+</section>
+
+<section id="lotrinh">
+  <h2>Lộ trình theo 3 mạch công việc</h2>
+  <p class="lead">Bù khoảng trống và hợp nhất bản Đồng Tháp xong trong 6 tháng (10/2026–03/2027). AI tham mưu đi song song qua thí điểm 2–3 tỉnh từ 10/2026. Nhân rộng và đóng gói đều chia 2 giai đoạn.</p>
+  <div class="lanes tbl" id="lanes"></div>
+</section>
+
+<section id="nhiemvu">
+  <h2>Nhiệm vụ đề xuất</h2>
+  <p class="lead">10 nhiệm vụ, chia 5 nhóm.</p>
+  <div class="tgroups">
+    <div class="tg"><h3>Kế hoạch và đánh giá</h3><ul>
+      <li>Lập kế hoạch nâng cấp, thông minh hóa iOffice v6</li>
+      <li>Đánh giá độ khó, thời gian các nội dung nâng cấp</li>
+      <li>Đánh giá phương án với các tính năng AI đã có tại Đồng Tháp</li>
+      <li>Đề xuất đối tác</li></ul></div>
+    <div class="tg"><h3>Kế hoạch 2027</h3><ul>
+      <li>Đưa chương trình AI iOffice vào kế hoạch 2027</li>
+      <li>Đặt chỉ tiêu 2027</li></ul></div>
+    <div class="tg"><h3>Đối tác dữ liệu</h3><ul>
+      <li>Nghiên cứu nguồn dữ liệu pháp luật quốc gia phục vụ AI tham mưu</li></ul></div>
+    <div class="tg"><h3>Thí điểm</h3><ul>
+      <li>Lựa chọn tỉnh thí điểm AI tham mưu</li></ul></div>
+    <div class="tg"><h3>Cơ chế và quản trị</h3><ul>
+      <li>Xây dựng cơ chế hợp nhất các tính năng AI đã có</li>
+      <li>Xây dựng quy chế đóng góp tính năng vào bản chuẩn</li></ul></div>
+  </div>
+</section>
+
+<section id="ruiro">
+  <h2>Rủi ro và biện pháp</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Rủi ro</th><th>Mức</th><th>Biện pháp</th></tr></thead>
+    <tbody id="tRisk"></tbody>
+  </table></div>
+</section>
+</div>
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+const FEATURES=[{"g": "Xử lý sâu 1 văn bản", "n": "Tóm tắt văn bản", "d": "Tóm tắt nhanh nội dung chính của các tệp văn bản đính kèm (PDF, Word).", "dtp": "Đáp ứng", "io": "Đáp ứng", "need": "Cao"}, {"g": "Xử lý sâu 1 văn bản", "n": "Tóm tắt 1 trang giấy", "d": "Tóm gọn toàn bộ nội dung tài liệu thành dung lượng tối giản trong phạm vi 1 trang.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Trung bình"}, {"g": "Xử lý sâu 1 văn bản", "n": "Phân tích & Tóm tắt tài liệu", "d": "Tổng hợp và cô đọng nội dung chuyên sâu theo cấu trúc báo cáo/tài liệu.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Cao"}, {"g": "Xử lý sâu 1 văn bản", "n": "Bóc tách nhiệm vụ", "d": "Tự động nhận diện và trích xuất danh sách các nhiệm vụ, công việc cụ thể được giao trong văn bản.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Cao"}, {"g": "Xử lý sâu 1 văn bản", "n": "Rà soát Tính pháp lý & Điểm nghẽn", "d": "Phân tích sự tuân thủ quy định pháp luật và phát hiện các vướng mắc, điểm nghẽn trong nội dung văn bản.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Cao"}, {"g": "Xử lý sâu 1 văn bản", "n": "Phân tích nội dung", "d": "Phân tích chi tiết các chủ đề, nội dung cốt lõi của tài liệu.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Trung bình"}, {"g": "Xử lý sâu 1 văn bản", "n": "Đánh giá và phân tích số liệu", "d": "Rà soát, tổng hợp và phân tích dữ liệu chỉ tiêu, số liệu thống kê có trong báo cáo.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Cao"}, {"g": "Xử lý sâu 1 văn bản", "n": "Phân tích tiến độ công việc", "d": "Theo dõi, đánh giá tình hình thực hiện và tiến độ hoàn thành các chỉ đạo/nhiệm vụ.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Trung bình"}, {"g": "Xử lý sâu 1 văn bản", "n": "Đánh giá Tiến độ & Phân tích Số liệu", "d": "Kết hợp đánh giá tiến độ thực hiện công việc song song với phân tích dữ liệu số liệu liên quan.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Trung bình"}, {"g": "Xử lý sâu 1 văn bản", "n": "So sánh văn bản", "d": "Đối chiếu sự thay đổi hoặc khác biệt giữa các phiên bản văn bản.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Trung bình"}, {"g": "Xử lý sâu 1 văn bản", "n": "So sánh & Đối chiếu Tài liệu", "d": "So sánh chuyên sâu nội dung giữa các hồ sơ, tài liệu liên quan với nhau.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Thấp"}, {"g": "Xử lý sâu 1 văn bản", "n": "Tạo văn bản giới thiệu", "d": "Tự động hỗ trợ dự thảo/tạo văn bản giới thiệu dựa trên dữ liệu văn bản có sẵn.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Trung bình"}, {"g": "Xử lý sâu 1 văn bản", "n": "Cho ý tưởng xây dựng giải pháp", "d": "Đề xuất các giải pháp, ý tưởng tham mưu xử lý công việc dựa trên ngữ cảnh tài liệu.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Trung bình"}, {"g": "Xử lý sâu 1 văn bản", "n": "Thêm vào ngữ cảnh chat (+ AI / Thêm vào ngữ cảnh)", "d": "Cho phép đính kèm trực tiếp file văn bản hoặc nội dung cụ thể vào khung chat với Trợ lý AI để truy vấn trực tiếp.", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Cao"}, {"g": "Trợ lý ảo / Chatbot", "n": "Trò chuyện sâu với tài liệu chỉ định", "d": "", "dtp": "Đáp ứng", "io": "Đáp ứng 1 phần", "need": "Cao"}, {"g": "Trợ lý ảo / Chatbot", "n": "Quản lý lịch sử chat", "d": "", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Cao"}, {"g": "Trợ lý ảo / Chatbot", "n": "Điều hướng từ Chatbot", "d": "Người dùng có thể nhấn vào văn bản từ kết quả trả về của chatbot để mở chi tiết văn bản/file tương ứng", "dtp": "Đáp ứng", "io": "Đáp ứng 1 phần", "need": "Cao"}, {"g": "Quản trị & cấu hình AI", "n": "Tạo/sửa/xóa mẫu (template) tính năng AI", "d": "", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Cao"}, {"g": "Quản trị & cấu hình AI", "n": "Nhập prompt tùy chỉnh cho tính năng", "d": "", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Cao"}, {"g": "Quản trị & cấu hình AI", "n": "Phân loại theo loại tính năng", "d": "", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Trung bình"}, {"g": "Quản trị & cấu hình AI", "n": "Quản lý nhiều bot AI", "d": "", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Trung bình"}, {"g": "Quản trị & cấu hình AI", "n": "Quản lý kho tri thức", "d": "", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Cao"}, {"g": "Quản trị & cấu hình AI", "n": "Thêm dữ liệu vào AI", "d": "Người dùng chủ động thêm dữ liệu VB vào kho tri thức, mục đích để sử dụng các tính năng AI hỗ trợ xử lý văn bản", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Cao"}, {"g": "Nghiệp vụ văn bản", "n": "Tìm kiếm toàn văn thông minh", "d": "", "dtp": "Đáp ứng", "io": "Đáp ứng", "need": "Cao"}, {"g": "Nghiệp vụ văn bản", "n": "Triển khai gợi ý điền form (chức năng OCR).", "d": "", "dtp": "Đáp ứng", "io": "Đáp ứng", "need": "Cao"}, {"g": "Nghiệp vụ văn bản", "n": "Dự thảo văn bản đi AI", "d": "", "dtp": "Đáp ứng", "io": "Đáp ứng", "need": "Cao"}, {"g": "Nghiệp vụ văn bản", "n": "Tóm tắt bút phê", "d": "", "dtp": "Đáp ứng", "io": "Chưa đáp ứng", "need": "Trung bình"}, {"g": "Nghiệp vụ văn bản", "n": "Gợi ý văn bản đến/đi", "d": "", "dtp": "Chưa đáp ứng", "io": "Đáp ứng", "need": "Cao"}, {"g": "Nghiệp vụ văn bản", "n": "Tham chiếu văn bản thông minh", "d": "", "dtp": "Chưa đáp ứng", "io": "Đáp ứng", "need": "Cao"}, {"g": "Nghiệp vụ văn bản", "n": "Lấy văn bản liên quan tự động", "d": "", "dtp": "Chưa đáp ứng", "io": "Đáp ứng", "need": "Cao"}, {"g": "Nghiệp vụ văn bản", "n": "Tìm kiếm trích yếu bằng giọng nói", "d": "", "dtp": "Chưa đáp ứng", "io": "Đáp ứng", "need": "Cao"}, {"g": "Nghiệp vụ văn bản", "n": "Lấy nội dung xử lý từ file đính kèm vào trường \"Nội dung xử lý\" khi xử lý văn bản", "d": "", "dtp": "Chưa đáp ứng", "io": "Đáp ứng", "need": "Cao"}];
+const UPGRADE=[{"sec": "Web", "g": "Tích hợp CHATBOT", "f": "Hỏi đáp bằng ngôn ngữ tự nhiên - chatbot", "st": "Cần phải training dữ liệu", "ic": "Có"}, {"sec": "Web", "g": "Tích hợp CHATBOT", "f": "Soạn thảo văn bản - chatbot", "st": "Cần phải training dữ liệu", "ic": "Có"}, {"sec": "Web", "g": "Tích hợp CHATBOT", "f": "Tìm kiếm thông minh - chatbot", "st": "Cần phải training dữ liệu", "ic": "Có"}, {"sec": "Web", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Lấy nội dung xử lý từ file đính kèm vào trường Nội dung xử lý", "st": "Đã có chức năng", "ic": "Có"}, {"sec": "Web", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Tham chiếu văn bản thông minh", "st": "Đã có chức năng", "ic": "Không"}, {"sec": "Web", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Lấy văn bản liên quan cho văn bản", "st": "Đã có chức năng", "ic": "Không"}, {"sec": "Web", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Tìm kiếm toàn văn tại control tìm kiếm", "st": "Cần phải training dữ liệu", "ic": "Có"}, {"sec": "Web", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Gợi ý nơi nhận", "st": "Cần phải training dữ liệu", "ic": "Có"}, {"sec": "Web", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Tóm tắt nội dung tệp đính kèm", "st": "Đã có chức năng", "ic": "Có"}, {"sec": "Web", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Kiểm tra lỗi chính tả", "st": "Đã có chức năng", "ic": "Có"}, {"sec": "Web", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Chức năng OCR", "st": "Đã có chức năng", "ic": "Có"}, {"sec": "Web", "g": "Tra cứu văn bản", "f": "Tra cứu bằng giọng nói", "st": "Đã có chức năng", "ic": "Không"}, {"sec": "Web", "g": "Xây dựng báo cáo/dashboard động", "f": "Báo cáo động", "st": "Chưa có chức năng", "ic": "Không"}, {"sec": "Web", "g": "Xây dựng báo cáo/dashboard động", "f": "Dashboard thông minh với khả năng tùy chỉnh widget theo vai trò người dùng", "st": "Chưa có chức năng", "ic": "Không"}, {"sec": "Web", "g": "Cải tiến giao diện web tăng trải nghiệm người dùng", "f": "Thay đổi giao diện, thích hợp với từng người dùng, tăng tính cá nhân hóa", "st": "Chưa có chức năng", "ic": "Không"}, {"sec": "App", "g": "Nâng cấp app mới", "f": "Nâng cấp phiên bản app work mới", "st": "Chưa xác định", "ic": "Không"}, {"sec": "App", "g": "Tích hợp CHATBOT", "f": "Hỏi đáp bằng ngôn ngữ tự nhiên - chatbot", "st": "Cần phải training dữ liệu", "ic": "Có"}, {"sec": "App", "g": "Tích hợp CHATBOT", "f": "Soạn thảo văn bản - chatbot", "st": "Cần phải training dữ liệu", "ic": "Có"}, {"sec": "App", "g": "Tích hợp CHATBOT", "f": "Tìm kiếm thông minh - chatbot", "st": "Cần phải training dữ liệu", "ic": "Có"}, {"sec": "App", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Lấy nội dung xử lý từ file đính kèm vào trường Nội dung xử lý", "st": "Đã có chức năng", "ic": "Có"}, {"sec": "App", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Tham chiếu văn bản thông minh", "st": "Đã có chức năng", "ic": "Không"}, {"sec": "App", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Lấy văn bản liên quan cho văn bản", "st": "Đã có chức năng", "ic": "Không"}, {"sec": "App", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Tìm kiếm toàn văn tại control tìm kiếm", "st": "Cần phải training dữ liệu", "ic": "Có"}, {"sec": "App", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Gợi ý nơi nhận", "st": "Cần phải training dữ liệu", "ic": "Có"}, {"sec": "App", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Tóm tắt nội dung tệp đính kèm", "st": "Đã có chức năng", "ic": "Có"}, {"sec": "App", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Kiểm tra lỗi chính tả", "st": "Đã có chức năng", "ic": "Có"}, {"sec": "App", "g": "Tích hợp AI vào tính năng của iOffice", "f": "Chức năng OCR", "st": "Đã có chức năng", "ic": "Có"}, {"sec": "App", "g": "Tra cứu", "f": "Tra cứu bằng giọng nói", "st": "Đã có chức năng", "ic": "Không"}];
+
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a={},p)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e};
+const tip=document.getElementById('tip');
+function showTip(ev,html){tip.innerHTML=html;tip.style.opacity=1;const x=Math.min(ev.clientX+14,innerWidth-tip.offsetWidth-8),y=Math.min(ev.clientY+14,innerHeight-tip.offsetHeight-8);tip.style.left=x+'px';tip.style.top=y+'px'}
+function hideTip(){tip.style.opacity=0}
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ok=v=>v==='Đáp ứng', part=v=>v==='Đáp ứng 1 phần';
+const chip=v=>ok(v)?`<span class="chip c-good">Đáp ứng</span>`:part(v)?`<span class="chip c-warn">Một phần</span>`:`<span class="chip c-crit">Chưa đáp ứng</span>`;
+const GROUPS=[...new Set(FEATURES.map(f=>f.g))];
+
+/* KPIs */
+const dtpOk=FEATURES.filter(f=>ok(f.dtp)).length, ioOk=FEATURES.filter(f=>ok(f.io)).length, ioPart=FEATURES.filter(f=>part(f.io)).length;
+const gapHigh=FEATURES.filter(f=>!ok(f.io)&&f.need==='Cao').length;
+const upHas=UPGRADE.filter(u=>u.st==='Đã có chức năng').length;
+document.getElementById('kpis').innerHTML=[
+ ['Tính năng AI được so sánh',FEATURES.length,'','4 nhóm',''],
+ ['DTP đáp ứng đầy đủ',dtpOk,'/'+FEATURES.length,'Đếm theo bảng chi tiết (Tổng quan ghi 28)',''],
+ ['iOffice v5 đáp ứng đầy đủ',ioOk,'/'+FEATURES.length,`Thêm ${ioPart} một phần (Tổng quan ghi 10)`,''],
+ ['Khoảng trống mức Cao',gapHigh,'','iOffice chưa đáp ứng đầy đủ','alert'],
+ ['Nội dung cần bổ sung vào v6',21,'','12 nội dung ưu tiên P1',''],
+ ['Bài toán lãnh đạo chưa có lời giải',3,'','Căn cứ pháp lý · VB Trung ương · Dự án','alert']
+].map(([l,v,s,n,c])=>`<div class="kpi ${c}"><span class="lab">${l}</span><span class="val">${v}<small>${s}</small></span><span class="note">${n}</span></div>`).join('');
+
+/* Horizontal grouped bars */
+function drawGroups(){
+  const svg=document.getElementById('chGroups');svg.innerHTML='';
+  const W=520,L=150,R=40,rowH=58,T=8,H=T+GROUPS.length*rowH+24;svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const max=Math.max(...GROUPS.map(g=>FEATURES.filter(f=>f.g===g).length));
+  const x=v=>L+(W-L-R)*v/max;
+  for(let t=0;t<=max;t+=2){el('line',{x1:x(t),x2:x(t),y1:T,y2:H-22,stroke:css('--grid')},svg);const tx=el('text',{x:x(t),y:H-6,'text-anchor':'middle','font-size':11,fill:css('--ink-3')},svg);tx.textContent=t}
+  GROUPS.forEach((g,i)=>{
+    const fs=FEATURES.filter(f=>f.g===g),tot=fs.length,d=fs.filter(f=>ok(f.dtp)).length,o=fs.filter(f=>ok(f.io)).length,y0=T+i*rowH;
+    const lb=el('text',{x:0,y:y0+20,'font-size':12.5,'font-weight':600,fill:css('--ink')},svg);lb.textContent=g;
+    const tl=el('text',{x:0,y:y0+36,'font-size':11.5,fill:css('--ink-3')},svg);tl.textContent=tot+' tính năng';
+    el('rect',{x:L,y:y0+8,width:x(tot)-L,height:34,fill:css('--grid'),rx:4},svg);
+    [[d,'--s-dtp','DTP',8],[o,'--s-io','iOffice v5',26]].forEach(([v,c,n,dy])=>{
+      const w=Math.max(x(v)-L,0);
+      const r=el('rect',{x:L,y:y0+dy,width:w,height:14,rx:3,fill:css(c)},svg);
+      const hit=el('rect',{x:L,y:y0+dy-2,width:W-L-R,height:18,fill:'transparent'},svg);
+      const vt=el('text',{x:L+w+6,y:y0+dy+11,'font-size':11.5,'font-family':'IBM Plex Mono, monospace',fill:css('--ink-2')},svg);vt.textContent=v+'/'+tot;
+      hit.addEventListener('mousemove',ev=>showTip(ev,`<b>${esc(g)}</b>${n}: ${v}/${tot} đáp ứng đầy đủ`));hit.addEventListener('mouseleave',hideTip);
+    });
+  });
+}
+/* Gap by need: stacked horizontal single bars */
+function drawGap(){
+  const svg=document.getElementById('chGap');svg.innerHTML='';
+  const needs=['Cao','Trung bình','Thấp'];const W=520,L=110,R=60,rowH=40,H=needs.length*rowH+30;svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const data=needs.map(n=>({n,no:FEATURES.filter(f=>f.need===n&&!ok(f.io)&&!part(f.io)).length,pa:FEATURES.filter(f=>f.need===n&&part(f.io)).length}));
+  const max=Math.max(...data.map(d=>d.no+d.pa));const x=v=>L+(W-L-R)*v/max;
+  for(let t=0;t<=max;t+=4){el('line',{x1:x(t),x2:x(t),y1:4,y2:H-22,stroke:css('--grid')},svg);const tx=el('text',{x:x(t),y:H-6,'text-anchor':'middle','font-size':11,fill:css('--ink-3')},svg);tx.textContent=t}
+  data.forEach((d,i)=>{const y=8+i*rowH;
+    const lb=el('text',{x:0,y:y+15,'font-size':12.5,'font-weight':600,fill:css('--ink')},svg);lb.textContent='Mức '+d.n;
+    el('rect',{x:L,y,width:Math.max(x(d.no)-L,0),height:20,rx:3,fill:css('--crit')},svg);
+    if(d.pa)el('rect',{x:x(d.no)+2,y,width:x(d.no+d.pa)-x(d.no)-2,height:20,rx:3,fill:css('--warn')},svg);
+    const vt=el('text',{x:x(d.no+d.pa)+8,y:y+15,'font-size':12,'font-family':'IBM Plex Mono, monospace',fill:css('--ink-2')},svg);vt.textContent=d.pa?`${d.no} + ${d.pa}`:d.no;
+    const hit=el('rect',{x:0,y:y-4,width:W,height:28,fill:'transparent'},svg);
+    hit.addEventListener('mousemove',ev=>showTip(ev,`<b>Mức ${d.n}</b>${d.no} chưa đáp ứng${d.pa?`, ${d.pa} đáp ứng một phần`:''}`));hit.addEventListener('mouseleave',hideTip);
+  });
+  const lg=el('g',{},svg);
+}
+
+/* Feature table */
+const fG=document.getElementById('fGroup');GROUPS.forEach(g=>fG.insertAdjacentHTML('beforeend',`<option>${esc(g)}</option>`));
+let view='all';
+['vAll','vGap','vIoOnly'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{view={vAll:'all',vGap:'gap',vIoOnly:'io'}[id];document.querySelectorAll('#sosanh .seg button').forEach(b=>b.setAttribute('aria-pressed',b.id===id));renderFeat()}));
+['fGroup','fNeed','fText'].forEach(id=>document.getElementById(id).addEventListener('input',renderFeat));
+function renderFeat(){
+  const g=fG.value,n=document.getElementById('fNeed').value,q=document.getElementById('fText').value.trim().toLowerCase();
+  const rows=FEATURES.filter(f=>(!g||f.g===g)&&(!n||f.need===n)&&(!q||(f.n+' '+f.d).toLowerCase().includes(q))&&(view==='all'||(view==='gap'&&!ok(f.io))||(view==='io'&&ok(f.io)&&!ok(f.dtp))));
+  document.getElementById('tFeat').innerHTML=rows.map(f=>`<tr class="${!ok(f.io)&&f.need==='Cao'?'gaprow':''}"><td>${esc(f.g)}</td><td><b>${esc(f.n)}</b>${f.d?`<span class="d">${esc(f.d)}</span>`:''}</td><td>${chip(f.dtp)}</td><td>${chip(f.io)}</td><td><span class="need ${f.need==='Cao'?'hi':''}">${esc(f.need)}</span></td></tr>`).join('')||`<tr><td colspan="5" style="color:var(--ink-3)">Không có tính năng khớp bộ lọc. Đổi nhóm hoặc xóa từ khóa tìm.</td></tr>`;
+  document.getElementById('fCount').textContent=`${rows.length}/${FEATURES.length} tính năng`;
+}
+
+/* Upgrade */
+const ST=[['Đã có chức năng','--good','c-good'],['Cần phải training dữ liệu','--warn','c-warn'],['Chưa có chức năng','--crit','c-crit'],['Chưa xác định','--muted','c-muted']];
+document.getElementById('lgUp').innerHTML=ST.map(s=>`<span><i style="background:var(${s[1]})"></i>${s[0]==='Cần phải training dữ liệu'?'Cần huấn luyện dữ liệu':s[0]}</span>`).join('');
+function drawUp(){
+  const svg=document.getElementById('chUp');svg.innerHTML='';const secs=['Web','App'];const W=520,L=50,R=20,H=150;svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const max=Math.max(...secs.map(s=>UPGRADE.filter(u=>u.sec===s).length));const x=v=>L+(W-L-R)*v/max;
+  for(let t=0;t<=max;t+=5){el('line',{x1:x(t),x2:x(t),y1:4,y2:H-22,stroke:css('--grid')},svg);const tx=el('text',{x:x(t),y:H-6,'text-anchor':'middle','font-size':11,fill:css('--ink-3')},svg);tx.textContent=t}
+  secs.forEach((s,i)=>{const y=14+i*56;let acc=0;
+    const lb=el('text',{x:0,y:y+20,'font-size':12.5,'font-weight':600,fill:css('--ink')},svg);lb.textContent=s;
+    ST.forEach(([k,c])=>{const v=UPGRADE.filter(u=>u.sec===s&&u.st===k).length;if(!v)return;
+      const x0=x(acc)+(acc?2:0),w=x(acc+v)-x(acc)-(acc?2:0);
+      el('rect',{x:x0,y,width:w,height:30,rx:3,fill:css(c)},svg);
+      const t=el('text',{x:x0+w/2,y:y+19,'text-anchor':'middle','font-size':12,'font-weight':600,fill:c==='--warn'||c==='--muted'?'#1a1a1a':'#ffffff'},svg);t.textContent=v;
+      const hit=el('rect',{x:x0,y,width:w,height:30,fill:'transparent'},svg);hit.addEventListener('mousemove',ev=>showTip(ev,`<b>${s}</b>${k}: ${v} hạng mục`));hit.addEventListener('mouseleave',hideTip);
+      acc+=v});
+  });
+}
+let upSec='';
+document.querySelectorAll('#nangcap .seg button').forEach(b=>b.addEventListener('click',()=>{upSec=b.dataset.sec;document.querySelectorAll('#nangcap .seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderUp()}));
+function renderUp(){
+  document.getElementById('tUp').innerHTML=UPGRADE.filter(u=>!upSec||u.sec===upSec).map(u=>{const s=ST.find(x=>x[0]===u.st);return `<tr><td><b>${esc(u.f)}</b>${u.g?`<span class="d">${esc(u.g)}</span>`:''}</td><td>${u.sec}</td><td><span class="chip ${s[2]}">${u.st==='Cần phải training dữ liệu'?'Cần huấn luyện':esc(u.st)}</span></td></tr>`}).join('');
+}
+
+/* Problems */
+const PROBS=[
+ {k:'A',t:'Kiểm tra căn cứ pháp lý "đúng và mới nhất"',q:'Văn bản trình viện dẫn có đúng, còn hiệu lực, mới nhất, đúng thẩm quyền không?',how:'Trích xuất căn cứ → tra hiệu lực trên vbpl.vn và Công báo tỉnh → kiểm tra thẩm quyền, thể thức → đối chiếu nội dung có trích dẫn.',s:{'Nhu cầu':5,'Cơ hội':5},mvp:'3–4 tháng'},
+ {k:'B',t:'Theo dõi tỉnh triển khai văn bản Trung ương',q:'Luật, NĐ, TT mới giao gì cho tỉnh; tỉnh đã ban hành văn bản triển khai chưa; ai đang nợ?',how:'Bóc tách nhiệm vụ giao địa phương → ghép với văn bản tỉnh đã ban hành → ma trận theo dõi → cảnh báo nợ đọng.',s:{'Nhu cầu':5,'Cơ hội':4},mvp:'4–6 tháng'},
+ {k:'C',t:'Thẩm tra tờ trình, quyết định dự án đầu tư',q:'Hồ sơ đủ chưa, đúng trình tự, thẩm quyền, nguồn vốn chưa; số liệu có khớp không?',how:'Phân loại hồ sơ → checklist thành phần theo Luật Đầu tư công 58/2024 → kiểm tra nhất quán số liệu giữa tờ trình, báo cáo, dự thảo QĐ.',s:{'Nhu cầu':5,'Cơ hội':5},mvp:'6–9 tháng'}];
+document.getElementById('probs').innerHTML=PROBS.map(p=>`<div class="prob"><span class="tag">Bài toán ${p.k}</span><h3>${p.t}</h3><p><b style="color:var(--ink)">Câu hỏi:</b> ${p.q}</p><p><b style="color:var(--ink)">AI làm gì:</b> ${p.how}</p><span class="pilot">DAS phối hợp công ty AI hoặc DTP đánh giá</span></div>`).join('');
+
+/* Priority list */
+const PRIO=[
+ ['Lớp tri thức pháp luật, kết nối vbpl.vn và Công báo tỉnh','Nền tảng và quản trị AI','P1','Khởi động 10/2026','Mới'],
+ ['Cổng AI chung, quản trị AI (phân quyền, nhật ký, gắn nhãn nội dung AI)','Nền tảng và quản trị AI','P1','10/2026–03/2027','Mới'],
+ ['Kích hoạt AI theo người dùng, nút AI cạnh từng file','Hợp nhất từ bản Đồng Tháp','P1','10/2026–03/2027','Có sẵn ở Đồng Tháp'],
+ ['Panel AI bên phải cạnh văn bản (thay khung chat che màn hình)','Nền tảng và quản trị AI','P1','10/2026–03/2027','Mới'],
+ ['Trò chuyện chuyên sâu nhiều tài liệu, lịch sử chat, điều hướng từ chatbot','Hợp nhất từ bản Đồng Tháp','P1','10/2026–03/2027','Có sẵn ở Đồng Tháp'],
+ ['Thư viện tính năng AI (8 loại, mẫu prompt có kiểm định)','Hợp nhất từ bản Đồng Tháp','P1','10/2026–03/2027','Có sẵn, cần cải tiến'],
+ ['Mẫu chuẩn: tóm tắt chuyên sâu, bóc tách nhiệm vụ và thời hạn','Bù khoảng trống (mẫu chuẩn)','P1','10/2026–03/2027','Có ở DTP dạng prompt'],
+ ['Kho tri thức có đánh dấu hiệu lực văn bản, phân quyền','Hợp nhất từ bản Đồng Tháp','P1','10/2026–03/2027','Có sẵn, cần cải tiến'],
+ ['Tóm tắt hồ sơ trình ký 1 trang','AI tham mưu cho lãnh đạo','P1','10/2026–03/2027','Mới'],
+ ['Tổng hợp ý kiến góp ý','AI tham mưu cho lãnh đạo','P1','10/2026–03/2027','Mới'],
+ ['A. Kiểm tra căn cứ pháp lý','AI tham mưu cho lãnh đạo','P1','Thí điểm 2–3 tỉnh từ 10/2026','Mới'],
+ ['B. Theo dõi tỉnh triển khai văn bản Trung ương','AI tham mưu cho lãnh đạo','P1','Thí điểm 2–3 tỉnh từ 10/2026','Mới'],
+ ['Mẫu chuẩn: phân tích số liệu, so sánh văn bản','Bù khoảng trống (mẫu chuẩn)','P2','10/2026–03/2027','Có ở DTP dạng prompt'],
+ ['Dự thảo văn bản đi theo mẫu, soạn trực tiếp trên web','Hợp nhất từ bản Đồng Tháp','P2','10/2026–03/2027','Có sẵn, cần cải tiến'],
+ ['C1. Checklist hồ sơ dự án đầu tư','AI tham mưu cho lãnh đạo','P2','Thí điểm 2–3 tỉnh từ 10/2026','Mới'],
+ ['Gợi ý bút phê, giao việc','AI tham mưu cho lãnh đạo','P2','Từ 04/2027','Mới'],
+ ['Biên bản họp thành nhiệm vụ','AI tham mưu cho lãnh đạo','P2','Từ 04/2027','Mới'],
+ ['Trợ lý điều hành hỏi đáp số liệu','AI tham mưu cho lãnh đạo','P2','Từ 04/2027','Mới'],
+ ['C2. Nhất quán số liệu, đối chiếu kế hoạch vốn','AI tham mưu cho lãnh đạo','P3','Sau thí điểm / khi có nhu cầu','Mới'],
+ ['Tóm tắt bút phê','Hợp nhất từ bản Đồng Tháp','P3','Sau thí điểm / khi có nhu cầu','Có sẵn ở Đồng Tháp'],
+ ['Mẫu: cho ý tưởng, tạo văn bản giới thiệu, đối chiếu tài liệu','Bù khoảng trống (mẫu chuẩn)','P3','Sau thí điểm / khi có nhu cầu','Có ở DTP dạng prompt']
+].map((r,i)=>({i:i+1,n:r[0],g:r[1],p:r[2],ph:r[3]==='Khởi động 10/2026'?'10/2026–03/2027':r[3],phl:r[3],st:r[4]}));
+const PG=['Nền tảng và quản trị AI','Hợp nhất từ bản Đồng Tháp','Bù khoảng trống (mẫu chuẩn)','AI tham mưu cho lãnh đạo'];
+const PPH=['10/2026–03/2027','Thí điểm 2–3 tỉnh từ 10/2026','Từ 04/2027','Sau thí điểm / khi có nhu cầu'];
+const PST=[...new Set(PRIO.map(x=>x.st))];
+const fill=(id,arr)=>{const s=document.getElementById(id);arr.forEach(v=>s.insertAdjacentHTML('beforeend',`<option>${esc(v)}</option>`))};
+fill('pGroup',PG);fill('pPhase',PPH);fill('pState',PST);
+let pP='';
+document.querySelectorAll('#uutien .seg button').forEach(b=>b.addEventListener('click',()=>{pP=b.dataset.p;document.querySelectorAll('#uutien .seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderPrio()}));
+['pGroup','pPhase','pState'].forEach(id=>document.getElementById(id).addEventListener('input',renderPrio));
+document.getElementById('pReset').addEventListener('click',()=>{['pGroup','pPhase','pState'].forEach(id=>document.getElementById(id).value='');pP='';document.querySelectorAll('#uutien .seg button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.p===''));renderPrio()});
+const pCls={P1:'p1c',P2:'p2c',P3:'p3c'};
+function curPrio(){const g=document.getElementById('pGroup').value,ph=document.getElementById('pPhase').value,st=document.getElementById('pState').value;return PRIO.filter(x=>(!g||x.g===g)&&(!ph||x.ph===ph)&&(!st||x.st===st)&&(!pP||x.p===pP))}
+function renderPrio(){
+  const rows=curPrio();const c=p=>rows.filter(x=>x.p===p).length;
+  document.getElementById('pStats').innerHTML=[['Nội dung đang lọc',rows.length,'/'+PRIO.length,''],['P1 – làm ngay',c('P1'),'','p1c'],['P2 – làm tiếp',c('P2'),'','p2c'],['P3 – khi có nhu cầu',c('P3'),'','p3c'],['Có sẵn ở Đồng Tháp',rows.filter(x=>x.st.startsWith('Có sẵn')).length,'',''],['Phát triển mới',rows.filter(x=>x.st==='Mới').length,'','']].map(([l,v,s,k])=>`<div class="stat ${k}"><span class="v">${v}<small>${s}</small></span><span class="l">${l}</span></div>`).join('');
+  document.getElementById('tPrio').innerHTML=rows.map(x=>`<tr><td class="need">${x.i}</td><td><b>${esc(x.n)}</b></td><td>${esc(x.g)}</td><td><span class="chip ${pCls[x.p]}">${x.p}</span></td><td>${esc(x.phl)}</td><td>${esc(x.st)}</td></tr>`).join('')||`<tr><td colspan="6" style="color:var(--ink-3)">Không có nội dung khớp bộ lọc. Bấm "Xóa lọc" để xem lại toàn bộ.</td></tr>`;
+  drawPrio(rows);drawPhase(rows);
+}
+function stackRows(svgId,cats,rows,key,label){
+  const svg=document.getElementById(svgId);svg.innerHTML='';const W=520,L=200,R=36,rowH=40,H=cats.length*rowH+30;svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const totAll=Math.max(1,...cats.map(cc=>PRIO.filter(x=>x[key]===cc).length));const x=v=>L+(W-L-R)*v/totAll;
+  for(let t=0;t<=totAll;t+=2){el('line',{x1:x(t),x2:x(t),y1:4,y2:H-22,stroke:css('--grid')},svg);const tx=el('text',{x:x(t),y:H-6,'text-anchor':'middle','font-size':11,fill:css('--ink-3')},svg);tx.textContent=t}
+  cats.forEach((cc,i)=>{const y=8+i*rowH;const lb=el('text',{x:0,y:y+15,'font-size':12,'font-weight':600,fill:css('--ink')},svg);lb.textContent=label(cc);let acc=0;
+    ['P1','P2','P3'].forEach(p=>{const v=rows.filter(r=>r[key]===cc&&r.p===p).length;if(!v)return;const x0=x(acc)+(acc?2:0),w=x(acc+v)-x(acc)-(acc?2:0);
+      el('rect',{x:x0,y,width:Math.max(w,1),height:22,rx:3,fill:css({P1:'--p1',P2:'--p2',P3:'--p3'}[p])},svg);
+      if(w>14){const t=el('text',{x:x0+w/2,y:y+15,'text-anchor':'middle','font-size':11.5,'font-weight':600,fill:'#ffffff'},svg);t.textContent=v}
+      const hit=el('rect',{x:x0,y,width:Math.max(w,1),height:22,fill:'transparent'},svg);hit.addEventListener('mousemove',ev=>showTip(ev,`<b>${esc(cc)}</b>${p}: ${v} nội dung`));hit.addEventListener('mouseleave',hideTip);acc+=v});
+    const n=rows.filter(r=>r[key]===cc).length;const vt=el('text',{x:x(acc)+8,y:y+15,'font-size':12,'font-family':'IBM Plex Mono, monospace',fill:css('--ink-2')},svg);vt.textContent=n});
+}
+const drawPrio=rows=>stackRows('chPrio',PG,rows,'g',s=>s.replace(' (mẫu chuẩn)','').replace(' cho lãnh đạo',''));
+const drawPhase=rows=>stackRows('chPhase',PPH,rows,'ph',s=>s.replace('Thí điểm 2–3 tỉnh từ 10/2026','Thí điểm từ 10/2026').replace('Sau thí điểm / khi có nhu cầu','Sau thí điểm'));
+
+/* Roadmap lanes */
+const LANES=[
+ ['Bù khoảng trống, hợp nhất Đồng Tháp',[['Phát triển trên bản chuẩn v6','10/2026–03/2027','12 nội dung (thứ tự 1–10, 13, 14): hợp nhất lớp AI Đồng Tháp, panel AI, thư viện tính năng, kho tri thức có hiệu lực, tóm tắt hồ sơ trình ký, tổng hợp góp ý; khởi động kết nối vbpl.vn',0],['Nhân rộng giai đoạn 1','Từ 04/2027','Thí điểm, tư vấn ngay với các đơn vị có yêu cầu; làm tiếp nội dung P2 (16–18)',0]]],
+ ['AI tham mưu (A, B, C)',[['Thí điểm tại 2–3 tỉnh','Từ 10/2026','Ưu tiên Đồng Tháp. Cùng tỉnh xây dựng A, B rồi C1; dùng hồ sơ thật làm bộ kiểm thử',1],['Nhân rộng giai đoạn 2','Sau đánh giá thí điểm','Đóng gói A, B, C1 cho các tỉnh; phát triển C2. Mốc do kết quả thí điểm và đánh giá của DAS phối hợp công ty AI hoặc DTP xác định',0]]],
+ ['Đóng gói và cơ chế',[['Giai đoạn 1: cơ chế hợp nhất','10/2026–03/2027','Phương án hợp tác, đánh giá chi phí, ghi nhận đóng góp, sở hữu mã nguồn và dữ liệu; gói AI iOffice cơ bản',0],['Giai đoạn 2: quy chế chung','Từ 04/2027','Quy chế VNPT tỉnh đóng góp tính năng; chia sẻ doanh thu khi nhân rộng; gói AI tham mưu và chính sách giá',0]]]];
+document.getElementById('lanes').innerHTML=LANES.map(([n,st])=>`<div class="lane"><div class="ln">${n}</div>${st.map(s=>`<div class="stage ${s[3]?'core':''}"><span class="when">${s[1]}</span><b>${s[0]}</b><p>${s[2]}</p></div>`).join('')}</div>`).join('');
+
+const RISK=[['AI kết luận sai về hiệu lực, lãnh đạo ký theo','Cao','Tra cứu xác định cho hiệu lực; luôn hiện nguồn và ngày dữ liệu; người duyệt chịu trách nhiệm'],
+ ['Không được kết nối vbpl.vn hoặc kết nối chậm','Cao','Đề xuất qua kênh Tập đoàn; dự phòng từ Công báo tỉnh và kho văn bản iOffice'],
+ ['Rò rỉ dữ liệu qua kho tri thức hoặc chia sẻ "Công khai"','Cao','Tắt chia sẻ công khai với văn bản điều hành; phân quyền theo người dùng; không đưa văn bản mật vào AI'],
+ ['Phân mảnh phiên bản: mỗi tỉnh một nhánh AI riêng','Trung bình','Hợp nhất nhánh Đồng Tháp vào bản chuẩn; tính năng mới làm trên nhánh chuẩn hoặc cấu hình qua Thư viện AI'],
+ ['Người dùng không tin, không dùng','Trung bình','Bắt đầu từ tính năng đúng ngay; đào tạo; công bố chỉ số hiệu quả theo tháng']];
+document.getElementById('tRisk').innerHTML=RISK.map(r=>`<tr><td>${r[0]}</td><td><span class="chip ${r[1]==='Cao'?'c-crit':'c-warn'}">${r[1]}</span></td><td>${r[2]}</td></tr>`).join('');
+
+const DT=[
+ ['Kích hoạt AI Bot','Thanh công cụ trên cùng','Bật AI theo từng người, triển khai dần','Đưa về bản chuẩn'],
+ ['Nút "AI" cạnh từng file: Kiểm tra chính tả, Tóm tắt, Thêm vào ngữ cảnh chat','Chi tiết văn bản đến','Đúng hướng "AI cạnh văn bản"; kết quả hiện trong chatbot','Đưa về bản chuẩn'],
+ ['Quản lý tính năng AI (8 loại, prompt có biến {file})','Quản lý trợ lý AI','Cá nhân hóa mạnh; phụ thuộc kỹ năng viết prompt','Cải tiến khi đưa về'],
+ ['Chatbot hỏi đáp tự do, tải kết quả','Biểu tượng góc phải','Khung chat phủ lên vùng xem file','Cải tiến khi đưa về'],
+ ['Trò chuyện chuyên sâu nhiều tài liệu','Chi tiết văn bản','Hỏi đáp đa tài liệu, hữu ích cho hồ sơ trình (bài toán C)','Đưa về bản chuẩn'],
+ ['Lịch sử chat','Chatbot','Xem lại hội thoại','Đưa về bản chuẩn'],
+ ['Kho tri thức cá nhân, thêm file từ văn bản đến','Quản lý trợ lý AI','Chưa có cơ chế đánh dấu hiệu lực văn bản','Cải tiến khi đưa về'],
+ ['Tìm kiếm toàn văn AI','Danh sách văn bản đến','Tìm được chuỗi trong nội dung file','iOffice đã có'],
+ ['OCR (AI) tự điền trường thông tin','Thêm mới văn bản đến','Cần người kiểm tra lại','iOffice đã có'],
+ ['Tóm tắt bút phê (AI)','Chi tiết văn bản','Chỉ có ích với văn bản luân chuyển dài','Cải tiến khi đưa về'],
+ ['Dự thảo văn bản đi theo mẫu + tạo nội dung AI, xuất Word','Dự thảo văn bản đi','Muốn sửa nội dung phải sang Word','Cải tiến khi đưa về']];
+let dtF='';
+document.querySelectorAll('#dongthap .seg button').forEach(b=>b.addEventListener('click',()=>{dtF=b.dataset.dt;document.querySelectorAll('#dongthap .seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderDT()}));
+function renderDT(){const rows=DT.filter(r=>!dtF||r[3]===dtF);const cls={'Đưa về bản chuẩn':'c-good','iOffice đã có':'c-muted','Cải tiến khi đưa về':'c-warn'};
+ document.getElementById('tDT').innerHTML=rows.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td>${esc(r[1])}</td><td>${esc(r[2])}</td><td><span class="chip ${cls[r[3]]}">${r[3]}</span></td><td><span class="pend">Chờ DAS đánh giá</span></td></tr>`).join('');
+ document.getElementById('dtCount').textContent=`${rows.length}/${DT.length} tính năng`}
+renderDT();
+
+
+
+
+function drawAll(){drawGroups();drawGap();drawUp();renderPrio()}
+renderFeat();renderUp();drawAll();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',drawAll);
+new MutationObserver(drawAll).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+</script>
